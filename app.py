@@ -3,14 +3,15 @@ from flask import render_template
 from flaskext.mysql import MySQL
 from flask import render_template,request
 from datetime import datetime
-
+from pathlib import Path,PurePath
+   
 app = Flask(__name__)
 mysql = MySQL()
-
 app.config['MYSQL_DATABASE_HOST']='localhost'
 app.config['MYSQL_DATABASE_USER']='root'
 app.config['MYSQL_DATABASE_PASSWORD']=''
 app.config['MYSQL_DATABASE_BD']='sistema'
+
 mysql.init_app(app)
 
 
@@ -39,9 +40,14 @@ def storage():
     nuevoNombreFoto=''
     now = datetime.now()
     tiempo = now.strftime("%Y%H%M%S")
+    
+    location = PurePath('Fullstack Python - Codo a codo', 'Flask', 'SistemaEmpleados', 'Flask-AppTest', 'uploads')
+    
     if _foto.filename!='':
         nuevoNombreFoto = tiempo+_foto.filename
-        _foto.save("uploads/"+nuevoNombreFoto)
+        _foto.save(str(location) + "/" + nuevoNombreFoto)
+#       _foto.save( + "/" + nuevoNombreFoto)
+
     
     #definimos y lanzamos la query
     sql = "INSERT INTO `sistema`.`empleados` (`id`, `nombre`, `correo`, `foto`) VALUES (NULL, %s, %s, %s);"
