@@ -1,4 +1,4 @@
-Formulario para Editar
+{% include 'header.html' %}
 
 {% for empleado in empleados %}
 
@@ -13,7 +13,9 @@ Formulario para Editar
     <input type="text" name="txtCorreo" value="{{ empleado[2] }}" id="txtCorreo">
     <br>
     Foto:
-    {{empleado[3]}}
+    <br>
+    <img class="img-thumbnail" width="100" src="{{url_for('uploads', nombreFoto=empleado[3])}}" alt="">
+    <br>
     <input type="file" name="txtFoto" id="txtFoto">
     <br>
     <br>
@@ -21,3 +23,5 @@ Formulario para Editar
 </form>
 
 {% endfor %}
+
+{% include 'footer.html' %}

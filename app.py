@@ -1,7 +1,5 @@
-from calendar import c
-from flask import Flask
+from flask import Flask,render_template,request,redirect,send_from_directory
 from flaskext.mysql import MySQL
-from flask import render_template,request,redirect
 from datetime import datetime
 from pathlib import Path,PurePath
 import os
@@ -16,11 +14,19 @@ app.config['MYSQL_DATABASE_BD']='sistema'
 
 mysql.init_app(app)
 
+#Metodo viejo, probablemente borrar comentarios si todo funciona ok
+#CARPETA = PurePath('Fullstack Python - Codo a codo', 'Flask', 'SistemaEmpleados', 'Flask-AppTest', 'uploads')
+#directory = PurePath('Fullstack Python - Codo a codo', 'Flask', 'SistemaEmpleados', 'Flask-AppTest', 'uploads')
+#app.config['CARPETA']=CARPETA
 
-CARPETA = PurePath('Fullstack Python - Codo a codo', 'Flask', 'SistemaEmpleados', 'Flask-AppTest', 'uploads')
-directory = PurePath('Fullstack Python - Codo a codo', 'Flask', 'SistemaEmpleados', 'Flask-AppTest', 'uploads')
+directory=Path() / "uploads"
+cwd=Path.cwd()
+up_dir=directory.resolve()
+print(directory.exists(), directory.is_dir(),cwd, directory)
+
+
+CARPETA= os.path.join('uploads')
 app.config['CARPETA']=CARPETA
-
 
 @app.route("/")
 def index():
@@ -76,7 +82,8 @@ def update():
     if _foto.filename!='':
         
         nuevoNombreFoto=tiempo+_foto.filename
-        _foto.save(str(directory) + "/" + nuevoNombreFoto)
+        _foto.save(str(up_dir)+ '/' + nuevoNombreFoto)
+        
         
         cursor.execute("SELECT foto FROM `sistema`.`empleados` WHERE id=%s", id)
         fila=cursor.fetchall()
@@ -110,8 +117,8 @@ def storage():
     
     if _foto.filename!='':
         nuevoNombreFoto = tiempo+_foto.filename
-        _foto.save(str(directory) + "/" + nuevoNombreFoto)
-#        _foto.save( "uploads/"+nuevoNombreFoto)
+#        _foto.save(str(directory) + "/" + nuevoNombreFoto)
+        _foto.save(str(up_dir)+ '/' +nuevoNombreFoto)
 
     
     #definimos y lanzamos la query
@@ -121,9 +128,12 @@ def storage():
     cursor = conn.cursor()
     cursor.execute(sql,datos)
     conn.commit()
-    return render_template('empleados/index.html')
+    return redirect('/')
 
-
+#genero acceso a la carpeta uploads usando send_from_directory
+@app.route('/upload/<nombreFoto>')
+def uploads(nombreFoto):
+    return send_from_directory(app.config['CARPETA'], nombreFoto)
 
 if __name__ == '__main__':
     app.run(debug=True)
