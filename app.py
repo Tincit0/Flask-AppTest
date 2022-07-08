@@ -1,4 +1,4 @@
-from flask import Flask,render_template,request,redirect,send_from_directory
+from flask import Flask,render_template,request,redirect,send_from_directory,url_for,flash
 from flaskext.mysql import MySQL
 from datetime import datetime
 from pathlib import Path,PurePath
@@ -6,6 +6,7 @@ import os
 
    
 app = Flask(__name__)
+app.secret_key="BuenaClave"
 mysql = MySQL()
 app.config['MYSQL_DATABASE_HOST']='localhost'
 app.config['MYSQL_DATABASE_USER']='root'
@@ -109,6 +110,10 @@ def storage():
     _nombre = request.form['txtNombre']
     _correo = request.form['txtCorreo']
     _foto = request.files['txtFoto']
+    
+    if _nombre=='' or _correo=='' or _foto=='':
+        flash('Por favor rellena todos los campos')
+        return redirect(url_for('create'))
     
     #bloque para guardar y nombrar la foto q suban
     nuevoNombreFoto=''
